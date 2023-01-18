@@ -1,0 +1,6 @@
+1. 브랜치 생성해주세요. ( 브랜치 이름 : feature )
+2. 폴더를 생성해주세요. ( 폴더 이름 예시: JangSoyun)
+3. 프로젝트 생성할 때 이 경로를 workspace로 사용하시면 됩니다.
+4. 프로젝트 이름 통일해주세요
+개인 프로젝트의 경우 : SpringbootProject
+실습 프로젝트의 경우 : SpringbootPractice
