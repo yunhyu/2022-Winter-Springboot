@@ -83,3 +83,7 @@ public void service(HttpServletRequest request, HttpServletreponse response)를 
 
 HttpServletRequest의 메소드인 getParameterMap();에서 리턴하는 value는 String[]이다. 때문에 사용할 때, String이 
 아닌 String[]로 변환해야한다.
+
+.
+
+그렇다.
