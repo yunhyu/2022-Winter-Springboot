@@ -1,0 +1,25 @@
+~~
+@Controller
+Public class TwoDice {
+	@RequestMapping("/rollDice");
+	public void main(HttpServletResponse response) {
+
+		int a = (int)(Math.random()*6)+1;
+		int b = (int)(Math.random()*6)+1;
+
+		response.setContentType("text/html");	// url내용형식 지정
+		response.CharacterEncoding("utf-8");	// 인코딩
+		PrintWriter out = response.getWriter();	// 
+
+		out.println("<html>");
+		out.println("<head>");
+		out.println("</head>");
+		out.println("<body>");
+		out.println("<img src='이미지 경로"+a+"'>");
+		out.println("<img src='이미지 경로2"+b+"'>");
+		out.println("</body>");
+		out.println("</html>");
+	}
+}
+
+위와 같은 클래스는 요청할 때마다 달라지므로 동적 리소스에 해당한다. 반대로 이미지 같이 변하지 않는 것은 정적 리소스함.

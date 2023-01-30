@@ -1,0 +1,85 @@
+base 64 = 7bit인 ASCII에 여러 특수 문자를 제외한 문자들로 6bit내로 압축함.=> HTTP는 비트를 text로 변환하는 자신만의 인코딩을 가지고 있음.
+
+oop의 5대 설계원칙을 SOLID라 하는데, 그 중 S, 단일 책임 원칙(SRP)은 하나의 메서드엔 하나의 일만 해야한다고 한다.
+
+다필요없고 코드를 분리할 때 3가지를 고려하는 것이 객체지향적이다.
+
+ 1. 관심사
+ 2. 자주 변하는 것과 아닌 것		- ?
+ 3. 공통 코드
+
+9강의 요일텔러 클래스를 보면, 수행하는 main 메소드는 크게 3가지 일을 수행하고 있음.
+
+ 1. 입력 받기.
+ 2. 계산?데이터 처리하기? 원하는 결과 만들기.
+ 3. 출력하기.
+
+HttpServletRequest를 활용하여 파라메터를 받는 방법을 썼었지만, 사실 그냥 기존에 했던 대로 해도 잘 작동한다.
+	+ int같은 것들은 자동으로 변환된다.
+
+기존 강의에서 데이터를 주고 받을 때 사용했던 객체를 Value Object라 했는데, 여기선 Model Object라함. 이렇게도 부르는 듯.
+
+이 강의에서 말하는 Model은 아마 Velue Object와 동의어인 것 같음. 때문에 내 생각엔 다음과 같다고 생각함.
+
+Spring MVC는 DispatcherServlet에서 입력을 받고, Controller에서 원하는 결과를 만들어 냄. 이 과정에서 어떤 데이터를 가져와야하면
+Controller가 Model에게서 가져옴. 데이터 저장도 마찬가지. 이후 결과를 View에 출력함.
+
+Model은 Velue Object처럼 정보를 주고 받는데 사용하는 객체가 아닌, 정보를 저장하는 객체였음. 그림으로 설명함
+
+
+	  Velue Object		|		   Model				+------+
+					|							|	 |
+	 +------------+		|	+------------+	+-------+		|	 |
+	 | controller |		|	| controller | =>	|       |		|	 |
+	 +------------+		|	+------------+	|	  |		|	 |
+		 			|				|	  |		|	 |
+		 |			|				|	  |		| life |
+	+--------------+		|				|	  |		|  of  |
+	| Value Object |		|				| Model |		|Object|
+	+--------------+		|				|	  |	     _|	 |_
+		 |			|				|	  |	     \	  /
+					|				|	  |		\      /
+	    +------+		|	   +------+		|	  |		 \    /
+	    | View |		|	   | View |	<====	|	  |		  \  /
+	    +------+		|	   +------+		+-------+		   \/
+
+
+
+Model을 사용할 때 주의할 점은 사용할 메소드의 매개변수에 Model객체를 넣어야 톰캣이 Model객체를 생성해준다. 이건 Request를 받는 것과 같음
+
+값을 출력 할때, return을 사용할 수 있다. return에 String을 쓰면 String과 일치하는 title을 가진 .jsp파일을 출력한다.
+//원래는 파일 위치를 적어야 하지만, .jsp의 경우 경로와 확장자를 생략해도 되는 듯하다.
+이걸 사용하면 이미 출력이 생겼으므로 HttpServletResponse를 사용할 필요가 없다.
+.jsp파일은 src/main/webapp/WEB-INF/views에 저장한다. (기본적으로 home.jsp파일이 있다.)
+.jsp파일에 값을 출력하고 싶다면 먼저 <p></p>를 <body>사이에 쓰고, 값이 출력될 자리에 ${변수이름 }을 사용한다.
+
+YoilTellerMVC를 만들 때 한번 매개변수를 Object로 받은 후 String으로 바꾼 후 다시 int로 바꿔보았다. ClassCastException가 
+나왔다. 객체가 맞나 싶어서 toString을 써보니 객체는 맞다.
+아마 매개변수를 Object로 받으면 객체가 되기는 하는데 String으로 변환할 수는 없는 듯 하다.
+
+근데 이 짓을 하고 보니 어차피 Query는 String만 쓸 수 있으니 String외에는 다르게 받을 수가 없다. int도 String인걸 자동으로 인식해
+알아서 바꿔주는 거였으니... 따라서 Object로 받을 수도 없는데다, 에초에 Object로 받을 일 자체가 없다. 
+
+===============================================================
+
+return을 사용할 때, 파일위치가 아닌 .jsp파일의 이름을 넣어도 작동하는 이유는 이거다.
+src/main/webapp/WEB-INF/spring/appServlet/servlet-comtext.xml의 19~22줄을 보면 view의 정보를 저장하는 곳이 있다.
+이 곳에 view의 위치와 파일 확장자가 지정되어있어 이름만 넣었을 때 이것을 가져오는 것이다.
+이 것을 수정해서 원하는 위치와 파일 확장자를 변경할 수 있다.
+참고로 위의 xml파일은 web관련된 설정이다.
+또 참고로 메소드를 void로 해놓으면 해당 메소드가 소속된 클래스의 이름과 동일한 .jsp파일을 출력한다. 없으면 말구
+
+================================================================
+
+pom.xml파일의 properties는 이후 나올 내용에서 반복되는, 참조할 수 있는 값이다. 
+pom.xml같이 설정에 관한 것을 수정한 후엔 프로잭트를 업데이트해줘야 한다. 우클릭 후 maven 안에 있다.
+
+================================================================
+
+@WebServlet("아무내용")은 @Controller와 @RequestMapping("아무내용")을 합친 것. tomcat의 라이브러리에 있음.
+class앞에 붙혀야 하며 때문에 Servlet에 비해 많은 클래스가 필요해지는 단점이 있음.
+반드시 HttpServlet을 상속받아야 하며 
+public void service(HttpServletRequest request, HttpServletreponse response)를 오버라이딩해서 사용함.
+
+HttpServletRequest의 메소드인 getParameterMap();에서 리턴하는 value는 String[]이다. 때문에 사용할 때, String이 
+아닌 String[]로 변환해야한다.
